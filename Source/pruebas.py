@@ -14,7 +14,7 @@ def main():
     path.append("/home/miguel/TFG/Stereo-Vision/Datasets/label_2/")
     path.append("/home/miguel/TFG/Stereo-Vision/Datasets/camera_param/calib/")
 
-    i = 250
+    i = 0
 
     image_file = sorted(os.listdir(path[0]))[i]
     label_file = sorted(os.listdir(path[1]))[i]
@@ -26,20 +26,32 @@ def main():
 
     camera_param = open(path[2]+param,'r')
     matrix = camera_param.readlines()
+    camera_param.close()
     matrix = (matrix[2].split(':'))[1].split(' ')
-    print(matrix)
-    Labels = open(path[1]+label_file,'r')
-    camera_param = open()
-    for label in Labels.readlines():
+    matrix.pop(0)
+    matrix[11] = matrix[11].rstrip('\n')
+    matrix = [float(i) for i in matrix]
+    
+    p = np.vstack((matrix[0:4],matrix[4:8],matrix[8:12]))
+    print(p)
+    labels = open(path[1]+label_file,'r')
+    #camera_param = open()
+    for label in labels:
         field = label.split(' ')
         if field[0] != 'DontCare':
             point1 = (int(float(field[4])),int(float(field[5])))
             point2 = (int(float(field[6])),int(float(field[7])))
-            center_world = (int(float(field[11])),int(float(field[12])),int(float(field[13])))
             cv2.rectangle(imgL,point1,point2,(0,255,0),1)
-            #cv2.circle(imgL,center,100,(0,0,255))
-        
-    Labels.close()
+            center = field[11:14]
+            center = [float(i) for i in center]
+            center.append(1)
+            center = np.transpose(np.array(center))
+            center = np.matmul(p,center)
+            print(center)
+            cv2.drawMarker(imgL,(int(center[0]/center[2]),int(center[1]/center[2])),(0,0,255))
+            
+    
+    labels.close()
 
     #imgR = cv2.imread(path[1]+image,0)
     #assert(imgR is not None)
