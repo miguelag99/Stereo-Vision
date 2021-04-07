@@ -9,6 +9,7 @@ import torch.nn.functional as F
 import json
 from torch.autograd import Variable
 from torchvision import transforms
+#Functions to operate with kitti dataset
 
 def read_params(file_path):
 
@@ -72,20 +73,20 @@ def compute_draw_3D(imgL,label_path,p):
             #    cv2.drawMarker(imgL,(int(cube_image[0,i]),int(cube_image[1,i])),(0,0,255))
             #Draw cube
 
-            cv2.line(imgL,(int(cube_image[0,0]),int(cube_image[1,0])),(int(cube_image[0,1]),int(cube_image[1,1])),(0,255,0),1)
-            cv2.line(imgL,(int(cube_image[0,0]),int(cube_image[1,0])),(int(cube_image[0,3]),int(cube_image[1,3])),(0,255,0),1)
-            cv2.line(imgL,(int(cube_image[0,2]),int(cube_image[1,2])),(int(cube_image[0,1]),int(cube_image[1,1])),(0,255,0),1)
-            cv2.line(imgL,(int(cube_image[0,2]),int(cube_image[1,2])),(int(cube_image[0,3]),int(cube_image[1,3])),(0,255,0),1)
+            cv2.line(imgL,(int(cube_image[0,0]),int(cube_image[1,0])),(int(cube_image[0,1]),int(cube_image[1,1])),(0,0,255),1)
+            cv2.line(imgL,(int(cube_image[0,0]),int(cube_image[1,0])),(int(cube_image[0,3]),int(cube_image[1,3])),(0,0,255),1)
+            cv2.line(imgL,(int(cube_image[0,2]),int(cube_image[1,2])),(int(cube_image[0,1]),int(cube_image[1,1])),(0,0,255),1)
+            cv2.line(imgL,(int(cube_image[0,2]),int(cube_image[1,2])),(int(cube_image[0,3]),int(cube_image[1,3])),(0,0,255),1)
 
-            cv2.line(imgL,(int(cube_image[0,4]),int(cube_image[1,4])),(int(cube_image[0,5]),int(cube_image[1,5])),(0,255,0),1)
-            cv2.line(imgL,(int(cube_image[0,4]),int(cube_image[1,4])),(int(cube_image[0,7]),int(cube_image[1,7])),(0,255,0),1)
-            cv2.line(imgL,(int(cube_image[0,6]),int(cube_image[1,6])),(int(cube_image[0,5]),int(cube_image[1,5])),(0,255,0),1)
-            cv2.line(imgL,(int(cube_image[0,6]),int(cube_image[1,6])),(int(cube_image[0,7]),int(cube_image[1,7])),(0,255,0),1)
+            cv2.line(imgL,(int(cube_image[0,4]),int(cube_image[1,4])),(int(cube_image[0,5]),int(cube_image[1,5])),(0,0,255),1)
+            cv2.line(imgL,(int(cube_image[0,4]),int(cube_image[1,4])),(int(cube_image[0,7]),int(cube_image[1,7])),(0,0,255),1)
+            cv2.line(imgL,(int(cube_image[0,6]),int(cube_image[1,6])),(int(cube_image[0,5]),int(cube_image[1,5])),(0,0,255),1)
+            cv2.line(imgL,(int(cube_image[0,6]),int(cube_image[1,6])),(int(cube_image[0,7]),int(cube_image[1,7])),(0,0,255),1)
 
-            cv2.line(imgL,(int(cube_image[0,0]),int(cube_image[1,0])),(int(cube_image[0,4]),int(cube_image[1,5])),(0,255,0),1)
-            cv2.line(imgL,(int(cube_image[0,1]),int(cube_image[1,1])),(int(cube_image[0,5]),int(cube_image[1,5])),(0,255,0),1)
-            cv2.line(imgL,(int(cube_image[0,2]),int(cube_image[1,2])),(int(cube_image[0,6]),int(cube_image[1,6])),(0,255,0),1)
-            cv2.line(imgL,(int(cube_image[0,3]),int(cube_image[1,3])),(int(cube_image[0,7]),int(cube_image[1,7])),(0,255,0),1)
+            cv2.line(imgL,(int(cube_image[0,0]),int(cube_image[1,0])),(int(cube_image[0,4]),int(cube_image[1,5])),(0,0,255),1)
+            cv2.line(imgL,(int(cube_image[0,1]),int(cube_image[1,1])),(int(cube_image[0,5]),int(cube_image[1,5])),(0,0,255),1)
+            cv2.line(imgL,(int(cube_image[0,2]),int(cube_image[1,2])),(int(cube_image[0,6]),int(cube_image[1,6])),(0,0,255),1)
+            cv2.line(imgL,(int(cube_image[0,3]),int(cube_image[1,3])),(int(cube_image[0,7]),int(cube_image[1,7])),(0,0,255),1)
 
 
     labels.close()

@@ -2,7 +2,8 @@
 /Datasets/
 /checkpoints/
 *.pt
-/results/
+*.png
+*.pkl
 /ultralytics_yolov5_master/
 
 

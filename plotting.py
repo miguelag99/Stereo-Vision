@@ -3,6 +3,21 @@ import numpy as np
 from enum import Enum
 import itertools
 
+def plot_regressed_3d_bbox(img, cam_to_img, box_2d, dimensions, alpha, theta_ray, img_2d=None):
+
+    # the math! returns X, the corners used for constraint
+    location, X = calc_location(dimensions, cam_to_img, box_2d, alpha, theta_ray)
+
+    orient = alpha + theta_ray
+
+    if img_2d is not None:
+        plot_2d_box(img_2d, box_2d)
+
+    plot_3d_box(img, cam_to_img, orient, dimensions, location) # 3d boxes
+
+    return location
+
+
 class cv_colors(Enum):
     RED = (0,0,255)
     GREEN = (0,255,0)
