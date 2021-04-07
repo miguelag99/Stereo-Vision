@@ -1,8 +1,9 @@
 #Custom
-/Datasets
+/Datasets/
+/checkpoints/
 *.pt
-Source/results/
-Source/ultralytics_yolov5_master/
+/results/
+/ultralytics_yolov5_master/
 
 
 # Byte-compiled / optimized / DLL files
