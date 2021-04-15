@@ -1,5 +1,5 @@
 #Custom
-/Datasets/
+Datasets_*/
 /checkpoints/
 *.pt
 *.png

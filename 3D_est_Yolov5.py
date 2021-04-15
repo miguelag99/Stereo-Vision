@@ -2,6 +2,7 @@ import gi
 gi.require_version('Gtk', '2.0')
 import argparse
 import os
+import time
 
 import torch
 import numpy as np
@@ -13,7 +14,7 @@ from torchvision.models import vgg
 
 
 WORK_PATH = os.getcwd()
-KITTI_PATH = os.getcwd()+'/Datasets'
+KITTI_PATH = os.getcwd()+'/Datasets_kitti'
 WEIGHTS_PATH = os.getcwd()+'/weights_3D_est'
 SAVE_PATH = os.getcwd()+'/results'
 
@@ -34,16 +35,21 @@ def Yolo5_det(imgs):
     model.conf = 0.5
     #Adding classes = n in torch.hub.load will change the output layers (must retrain with the new number of classes)
 
+    t_ini = time.time()
+
     # Inference
     results = model(imgs)
     #print(results.pred)
     print('\n')
-    
+
+    t_end = time.time()
+    elapsed = (t_end - t_ini)/len(imgs)
+    print("Yolo_time (avg sec per image): {}\n".format(elapsed))
+
     return results
 
 
 def load_model_est(dir):
-
 
 
     model_lst = [x for x in sorted(os.listdir(dir)) if x.endswith('.pkl')]
@@ -79,21 +85,33 @@ def compare_3Dbbox():
     gt = sorted(os.listdir(dir3))
 
     imgs = [dir1 + name for name in names[args.number_init:args.number_end]]     # batch of images  
-    
+    imgs = [os.getcwd()+'/Datasets_nu/samples/CAM_FRONT/n008-2018-09-18-14-18-33-0400__CAM_FRONT__1537294833612404.jpg']
     cal_files = [dir2 + name for name in par[args.number_init:args.number_end]]  # batch of camera params 
     label_files = [dir3 + name for name in gt[args.number_init:args.number_end]] # batch of ground truth 
-
+    
     detections = Yolo5_det(imgs)
+    
     imgs = [dir1 + name for name in names[args.number_init:args.number_end]]  # batch of images
+    imgs = [os.getcwd()+'/Datasets_nu/samples/CAM_FRONT/n008-2018-09-18-14-18-33-0400__CAM_FRONT__1537294833612404.jpg']
+
     #print(imgs) 
     
     #detections.show()
     #detections.save()
+
+
+    elapsed = 0
+    max_t = 0
+    min_t = 10
+
     averages = ClassAverages()
     angle_bins = generate_bins(2)
     model = load_model_est(WEIGHTS_PATH)
 
     for i in range(len(imgs)):
+
+        t_ini = time.time()
+
         truth_img = cv2.imread(imgs[i])
         im = np.copy(truth_img)
         yolo_im = np.copy(truth_img)
@@ -101,12 +119,16 @@ def compare_3Dbbox():
         elem_box = detections.pred[i]
         
         for element in elem_box:
+            
             #print(element)
             name = detections.names[int(element.data[5])]
             #print(name)
             
             calib_file = cal_files[i]
             calib_file = read_params(calib_file) #Params matrix for each image
+            print(calib_file)
+
+            calib_file = np.vstack(([1270.794023,0.0,739.867704,0],[0.0,1274.038815,423.575943,0],[0.0,0.0,1.0,0]))
 
             detectedObject = DetectedObject(im, name,element, calib_file) #New class for each detection to compute theta and crop the detection
 
@@ -128,7 +150,13 @@ def compare_3Dbbox():
             input_tensor = torch.zeros([1,3,224,224]).cuda()
             input_tensor[0,:,:,:] = input_img
 
+            
+
             [orient, conf, dim] = model(input_tensor) #Apply the model to get the estimation
+
+
+            
+
             orient = orient.cpu().data.numpy()[0, :, :]
             conf = conf.cpu().data.numpy()[0, :]
             dim = dim.cpu().data.numpy()[0, :]
@@ -148,14 +176,23 @@ def compare_3Dbbox():
 
             #compute_draw_3D(im,label_files[i],proj_matrix) #Draw the kitti 3D bbox.
 
-            #cv2.imshow("{}".format(i),im)
-            cv2.imwrite(SAVE_PATH+"/{}.png".format(i),im)
-            cv2.imwrite(SAVE_PATH+"/{}_yolo.png".format(i),yolo_im)
+            cv2.imshow("{}".format(i),im)
+            #cv2.imwrite(SAVE_PATH+"/{}.png".format(i),im)
+            #cv2.imwrite(SAVE_PATH+"/{}_yolo.png".format(i),yolo_im)
+
+        t_end = time.time()
+        elapsed += (t_end - t_ini)
+        if((t_end - t_ini) > max_t):
+            max_t = (t_end - t_ini)
+        elif((t_end - t_ini) < min_t):
+            min_t = (t_end - t_ini)
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
     
-
+    elapsed = elapsed/len(imgs)
+    print("Est_time:\nAvg sec per image: {}\nMax:{} Min:{}\n".format(elapsed,max_t,min_t))
+    
 
 if __name__ == "__main__":
   
