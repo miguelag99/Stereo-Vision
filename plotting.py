@@ -3,10 +3,43 @@ import numpy as np
 from enum import Enum
 import itertools
 
+#Custom plotting funcion and classes
+
+def plot_bird_view(birdview_im, dimensions, alpha, theta_ray,location):
+    color = cv_colors.RED.value
+
+    orient = alpha + theta_ray
+    
+    R = rotation_matrix(orient)
+    corners = create_corners(dimensions, location = location, R = R)
+
+    #Print objects center
+    '''
+    x_bird = (1000/50)*location[0]+500
+    z_bird = 1000-(1000/100)*location[2]
+    bird_point = (int(x_bird),int(z_bird))
+    cv2.circle(birdview_im, bird_point, 3, color, thickness=10)
+    '''
+
+    #Print 3D box view
+    for pt in corners:
+        print("Corner x:{} Corner z:{}\n".format(pt[0],pt[2]))
+        x_bird = (1000/50)*pt[0]+500
+        z_bird = 1000-(1000/100)*pt[2]
+        bird_point = (int(x_bird),int(z_bird))
+        cv2.circle(birdview_im, bird_point, 1, color, thickness=3)
+
+
+    
+
+#Plotting function and classes from the estimations gitHub
+
 def plot_regressed_3d_bbox(img, cam_to_img, box_2d, dimensions, alpha, theta_ray, img_2d=None):
 
     # the math! returns X, the corners used for constraint
     location, X = calc_location(dimensions, cam_to_img, box_2d, alpha, theta_ray)
+
+    
 
     orient = alpha + theta_ray
 
@@ -97,7 +130,7 @@ def plot_3d_box(img, cam_to_img, ry, dimension, center):
     R = rotation_matrix(ry)
 
     corners = create_corners(dimension, location=center, R=R)
-
+    print("Center:{}\n".format(center))
     # to see the corners on image as red circles
     # plot_3d_pts(img, corners, center,cam_to_img=cam_to_img, relative=False)
 
