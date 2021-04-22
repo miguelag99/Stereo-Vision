@@ -31,7 +31,7 @@ def Yolo5_det(imgs):
     
     
     # Images
-    model.classes = [0,1,2,5,7] #Person(0),bicycle(1),car(2),motorcycle(3),bus(5),truck(7),traffic light(9),stop(11)
+    model.classes = [0,1,2,3,5,7] #Person(0),bicycle(1),car(2),motorcycle(3),bus(5),truck(7),traffic light(9),stop(11)
     model.conf = 0.6
     #Adding classes = n in torch.hub.load will change the output layers (must retrain with the new number of classes)
 
@@ -92,6 +92,7 @@ def compare_3Dbbox():
     
     detections = Yolo5_det(imgs)
     
+
     imgs = [dir1 + name for name in names[args.number_init:args.number_end]]  # batch of images
     
 
@@ -119,8 +120,6 @@ def compare_3Dbbox():
         birdview_im = np.zeros((1000,1000,3))
 
         
-
-
         elem_box = detections.pred[i]
         
         for element in elem_box:
@@ -138,13 +137,7 @@ def compare_3Dbbox():
             theta_ray = detectedObject.theta_ray
             input_img = detectedObject.img
             proj_matrix = detectedObject.proj_matrix
-
-            if (name == "person"):
-                name = "pedestrian"
-            if (name == "bicycle"):
-                name = "cyclist"
-            if (name == "bus"):
-                name = "truck"        
+          
             
             detected_Class = name
             
@@ -179,11 +172,11 @@ def compare_3Dbbox():
 
             #compute_draw_3D(im,label_files[i],proj_matrix) #Draw the kitti 3D bbox.
 
-        cv2.imshow("{}".format(i),im)
-        cv2.imshow("{}_birdview".format(i),birdview_im)
-        #cv2.imwrite(SAVE_PATH+"/{}.png".format(i),im)
+        #cv2.imshow("{}".format(i),im)
+        #cv2.imshow("{}_birdview".format(i),birdview_im)
+        cv2.imwrite(SAVE_PATH+"/{}.png".format(i),im)
         #cv2.imwrite(SAVE_PATH+"/{}_yolo.png".format(i),yolo_im)
-
+        cv2.imwrite(SAVE_PATH+"/{}_bird.png".format(i),birdview_im)
         t_end = time.time()
         elapsed += (t_end - t_ini)
         if((t_end - t_ini) > max_t):

@@ -7,11 +7,19 @@ import itertools
 
 def plot_bird_view(birdview_im, dimensions, alpha, theta_ray,location):
     color = cv_colors.RED.value
+    pix_x = 1000
+    pix_z = 1000
+    x_max = 50
+    z_max = 50
 
     orient = alpha + theta_ray
-    
     R = rotation_matrix(orient)
+
     corners = create_corners(dimensions, location = location, R = R)
+    cv2.circle(birdview_im, (int(pix_x/2),int(pix_z)), 4, color, thickness=5)
+    
+    
+
 
     #Print objects center
     '''
@@ -21,13 +29,33 @@ def plot_bird_view(birdview_im, dimensions, alpha, theta_ray,location):
     cv2.circle(birdview_im, bird_point, 3, color, thickness=10)
     '''
 
-    #Print 3D box view
+    #Print 3D box bird view corners
+    '''
     for pt in corners:
-        print("Corner x:{} Corner z:{}\n".format(pt[0],pt[2]))
         x_bird = (1000/50)*pt[0]+500
         z_bird = 1000-(1000/100)*pt[2]
         bird_point = (int(x_bird),int(z_bird))
         cv2.circle(birdview_im, bird_point, 1, color, thickness=3)
+    '''
+
+    #Print 3D box bird view
+
+    p1 = corners[0]
+    p2 = corners[1]
+    p3 = corners[4]
+    p4 = corners[5]
+    x1 = (pix_x/x_max)*p1[0]+(pix_x/2)
+    z1 = pix_z-(pix_z/z_max)*p1[2]
+    x2 = (pix_x/x_max)*p2[0]+(pix_x/2)
+    z2 = pix_z-(pix_z/z_max)*p2[2]
+    x3 = (pix_x/x_max)*p3[0]+(pix_x/2)
+    z3 = pix_z-(pix_z/z_max)*p3[2]   
+    x4 = (pix_x/x_max)*p4[0]+(pix_x/2)
+    z4 = pix_z-(pix_z/z_max)*p4[2]    
+    cv2.line(birdview_im, (int(x1),int(z1)), (int(x2),int(z2)), cv_colors.GREEN.value, 1)
+    cv2.line(birdview_im, (int(x1),int(z1)), (int(x3),int(z3)), cv_colors.GREEN.value, 1)
+    cv2.line(birdview_im, (int(x4),int(z4)), (int(x2),int(z2)), cv_colors.GREEN.value, 1)
+    cv2.line(birdview_im, (int(x4),int(z4)), (int(x3),int(z3)), cv_colors.GREEN.value, 1)
 
 
     
@@ -130,7 +158,7 @@ def plot_3d_box(img, cam_to_img, ry, dimension, center):
     R = rotation_matrix(ry)
 
     corners = create_corners(dimension, location=center, R=R)
-    print("Center:{}\n".format(center))
+  
     # to see the corners on image as red circles
     # plot_3d_pts(img, corners, center,cam_to_img=cam_to_img, relative=False)
 
