@@ -81,6 +81,9 @@ def compare_3Dbbox():
     dir2 = KITTI_PATH+'/camera_param/calib/'
     dir3 = KITTI_PATH+'/label_2/'
 
+    if not os.path.exists(SAVE_PATH):
+        os.makedirs(SAVE_PATH)
+
     names = sorted(os.listdir(dir1))
     par = sorted(os.listdir(dir2))
     gt = sorted(os.listdir(dir3))
@@ -123,66 +126,72 @@ def compare_3Dbbox():
         elem_box = detections.pred[i]
         
         for element in elem_box:
-            
-            #print(element)
+        
             name = detections.names[int(element.data[5])]
             #print(name)
             
-            calib_file = cal_files[i]
-            calib_file = read_params(calib_file) #Params matrix for each image
-            
+            if int(element.data[0]) > 5 and int(element.data[2] < (im.shape[1]-5)): #Filter for cropped objects
 
-            detectedObject = DetectedObject(im, name,element, calib_file) #New class for each detection to compute theta and crop the detection
+                calib_file = cal_files[i]
+                calib_file = read_params(calib_file) #Params matrix for each image
+                
 
-            theta_ray = detectedObject.theta_ray
-            input_img = detectedObject.img
-            proj_matrix = detectedObject.proj_matrix
-          
-            
-            detected_Class = name
-            
-            box_2d = [(int(element[0].item()),int(element[1].item())),(int(element[2].item()),int(element[3].item()))] #2D Bbox as a topule of points
+                detectedObject = DetectedObject(im, name,element, calib_file) #New class for each detection to compute theta and crop the detection
 
-            input_tensor = torch.zeros([1,3,224,224]).cuda()
-            input_tensor[0,:,:,:] = input_img
+                theta_ray = detectedObject.theta_ray
+                input_img = detectedObject.img
+                proj_matrix = detectedObject.proj_matrix
+                       
 
-            
+                detected_Class = name
+                
+                box_2d = [(int(element[0].item()),int(element[1].item())),(int(element[2].item()),int(element[3].item()))] #2D Bbox as a topule of points
 
-            [orient, conf, dim] = model(input_tensor) #Apply the model to get the estimation
+                input_tensor = torch.zeros([1,3,224,224]).cuda()
+                input_tensor[0,:,:,:] = input_img
+
+                
+
+                [orient, conf, dim] = model(input_tensor) #Apply the model to get the estimation
 
 
-            orient = orient.cpu().data.numpy()[0, :, :]
-            conf = conf.cpu().data.numpy()[0, :]
-            dim = dim.cpu().data.numpy()[0, :]
-            
-            dim += averages.get_item(detected_Class)
+                orient = orient.cpu().data.numpy()[0, :, :]
+                conf = conf.cpu().data.numpy()[0, :]
+                dim = dim.cpu().data.numpy()[0, :]
+                
+                dim += averages.get_item(detected_Class)
 
-            argmax = np.argmax(conf)
-            orient = orient[argmax, :]
-            cos = orient[0]
-            sin = orient[1]
-            alpha = np.arctan2(sin, cos)
-            alpha += angle_bins[argmax]
-            alpha -= np.pi
+                argmax = np.argmax(conf)
+                orient = orient[argmax, :]
+                cos = orient[0]
+                sin = orient[1]
+                alpha = np.arctan2(sin, cos)
+                alpha += angle_bins[argmax]
+                alpha -= np.pi
 
-            location = plot_regressed_3d_bbox(im, proj_matrix, box_2d, dim, alpha, theta_ray, truth_img) #Plot the estimation
-            plot_2d_box(yolo_im,box_2d) #Plot the yolo detection
+                location = plot_regressed_3d_bbox(im, proj_matrix, box_2d, dim, alpha, theta_ray, truth_img) #Plot the estimation
+                plot_2d_box(yolo_im,box_2d) #Plot the yolo detection
 
-            plot_bird_view(birdview_im, dim, alpha, theta_ray,location)
+                plot_bird_view(birdview_im, dim, alpha, theta_ray,location)
 
-            #compute_draw_3D(im,label_files[i],proj_matrix) #Draw the kitti 3D bbox.
+                #compute_draw_3D(im,label_files[i],proj_matrix) #Draw the kitti 3D bbox.
 
-        #cv2.imshow("{}".format(i),im)
-        #cv2.imshow("{}_birdview".format(i),birdview_im)
-        cv2.imwrite(SAVE_PATH+"/{}.png".format(i),im)
-        #cv2.imwrite(SAVE_PATH+"/{}_yolo.png".format(i),yolo_im)
-        cv2.imwrite(SAVE_PATH+"/{}_bird.png".format(i),birdview_im)
         t_end = time.time()
         elapsed += (t_end - t_ini)
         if((t_end - t_ini) > max_t):
             max_t = (t_end - t_ini)
         elif((t_end - t_ini) < min_t):
             min_t = (t_end - t_ini)
+
+        
+        cv2.putText(birdview_im,"{:.4f} s".format(t_end - t_ini),(50,birdview_im.shape[1]-50),cv2.FONT_HERSHEY_SIMPLEX,1,cv_colors.RED.value,1)
+        
+        #cv2.imshow("{}".format(i),im)
+        #cv2.imshow("{}_birdview".format(i),birdview_im)
+        cv2.imwrite(SAVE_PATH+"/{}.png".format(i),im)
+        cv2.imwrite(SAVE_PATH+"/{}_yolo.png".format(i),yolo_im)
+        cv2.imwrite(SAVE_PATH+"/{}_bird.png".format(i),birdview_im)
+
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
