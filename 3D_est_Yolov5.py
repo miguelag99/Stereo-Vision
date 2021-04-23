@@ -27,7 +27,7 @@ def Yolo5_det(imgs):
 
     torch.hub.set_dir(WORK_PATH)
     # Model
-    model = torch.hub.load('ultralytics/yolov5', 'yolov5m')
+    model = torch.hub.load('ultralytics/yolov5', 'yolov5l')
     
     
     # Images
