@@ -20,6 +20,7 @@ SAVE_PATH = os.getcwd()+'/results'
 
 from func import *
 from plotting import *
+from eval import *
 
 
 
@@ -32,7 +33,7 @@ def Yolo5_det(imgs):
     
     # Images
     model.classes = [0,1,2,3,5,7] #Person(0),bicycle(1),car(2),motorcycle(3),bus(5),truck(7),traffic light(9),stop(11)
-    model.conf = 0.6
+    model.conf = 0.7
     #Adding classes = n in torch.hub.load will change the output layers (must retrain with the new number of classes)
 
     t_ini = time.time()
@@ -75,6 +76,7 @@ def compare_3Dbbox():
 
     parser.add_argument("-ini","--number_init",help ="Num de imagen inicial",type =int)
     parser.add_argument("-end","--number_end",help ="Num de imagen final",type =int)
+    parser.add_argument("-eval","--evaluate",help="Evaluar estimacion",action="store_true")
     args = parser.parse_args()
     
     dir1 = KITTI_PATH+'/image_left/'
@@ -113,6 +115,8 @@ def compare_3Dbbox():
     angle_bins = generate_bins(2)
     model = load_model_est(WEIGHTS_PATH)
 
+    estimations = []
+
     for i in range(len(imgs)):
 
         t_ini = time.time()
@@ -122,7 +126,9 @@ def compare_3Dbbox():
         yolo_im = np.copy(truth_img)
         birdview_im = np.zeros((1000,1000,3))
 
+        estimations.append(estimation(imgs[i],label_files[i]))
         
+
         elem_box = detections.pred[i]
         
         for element in elem_box:
@@ -174,6 +180,13 @@ def compare_3Dbbox():
 
                 plot_bird_view(birdview_im, dim, alpha, theta_ray,location)
 
+                if(args.evaluate):
+
+                        orient = alpha + theta_ray
+                        R = rotation_matrix(orient)
+                        corners = create_corners(dim, location = location, R = R)
+                        estimations[i].add_object(corners)
+
                 #compute_draw_3D(im,label_files[i],proj_matrix) #Draw the kitti 3D bbox.
 
         t_end = time.time()
@@ -188,10 +201,11 @@ def compare_3Dbbox():
         
         #cv2.imshow("{}".format(i),im)
         #cv2.imshow("{}_birdview".format(i),birdview_im)
-        cv2.imwrite(SAVE_PATH+"/{}.png".format(i),im)
-        cv2.imwrite(SAVE_PATH+"/{}_yolo.png".format(i),yolo_im)
-        cv2.imwrite(SAVE_PATH+"/{}_bird.png".format(i),birdview_im)
+        #cv2.imwrite(SAVE_PATH+"/{}.png".format(i),im)
+        #cv2.imwrite(SAVE_PATH+"/{}_yolo.png".format(i),yolo_im)
+        #cv2.imwrite(SAVE_PATH+"/{}_bird.png".format(i),birdview_im)
 
+    
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
@@ -199,6 +213,9 @@ def compare_3Dbbox():
     elapsed = elapsed/len(imgs)
     print("Est_time:\nAvg sec per image: {}\nMax:{} Min:{}\n".format(elapsed,max_t,min_t))
     
+    if(args.evaluate):
+        eval_bird(estimations)
+
 
 if __name__ == "__main__":
   
