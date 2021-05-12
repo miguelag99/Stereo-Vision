@@ -126,7 +126,8 @@ def compare_3Dbbox():
         yolo_im = np.copy(truth_img)
         birdview_im = np.zeros((1000,1000,3))
 
-        estimations.append(estimation(imgs[i],label_files[i]))
+        if(args.evaluate):
+            estimations.append(estimation(imgs[i],label_files[i]))
         
 
         elem_box = detections.pred[i]
@@ -176,18 +177,20 @@ def compare_3Dbbox():
                 alpha -= np.pi
 
                 location = plot_regressed_3d_bbox(im, proj_matrix, box_2d, dim, alpha, theta_ray, truth_img) #Plot the estimation
-                plot_2d_box(yolo_im,box_2d) #Plot the yolo detection
+                
+                #Only objects within z = 40m
+                if(location[2]< 20):
+                    plot_2d_box(yolo_im,box_2d) #Plot the yolo detection
+                    plot_bird_view(birdview_im, dim, alpha, theta_ray,location)
 
-                plot_bird_view(birdview_im, dim, alpha, theta_ray,location)
+                    if(args.evaluate):
 
-                if(args.evaluate):
+                            orient = alpha + theta_ray
+                            R = rotation_matrix(orient)
+                            corners = create_corners(dim, location = location, R = R)
+                            estimations[i].add_object(corners)
 
-                        orient = alpha + theta_ray
-                        R = rotation_matrix(orient)
-                        corners = create_corners(dim, location = location, R = R)
-                        estimations[i].add_object(corners)
-
-                #compute_draw_3D(im,label_files[i],proj_matrix) #Draw the kitti 3D bbox.
+                    #compute_draw_3D(im,label_files[i],proj_matrix) #Draw the kitti 3D bbox.
 
         t_end = time.time()
         elapsed += (t_end - t_ini)
