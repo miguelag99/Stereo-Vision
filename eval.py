@@ -27,7 +27,7 @@ def eval_bird(estimations):
 
     for est in estimations:
         labels_f = open(est.label_id,'r')
-        print(est.im_id)
+        #print(est.im_id)
         for corners in est.objects:
            
             p1 = corners[0]
@@ -89,7 +89,7 @@ def eval_bird(estimations):
 
             if(min_dist < 100 and min_iou <= 1):
                 i += 1
-                print("\nIoU{} GT:{} est:{} dist:{}".format(min_iou,min_center_gt,min_center,min_dist))
+                #print("\nIoU{} GT:{} est:{} dist:{}".format(min_iou,min_center_gt,min_center,min_dist))
                 mean_iou += min_iou
                 mean_d += min_dist
 
@@ -97,10 +97,9 @@ def eval_bird(estimations):
 
     mean_iou *= 1/i
     mean_d *= 1/i
-    print("\n\nMean iou:{} Mean dist:{}\n".format(mean_iou,mean_d))
+    #print("\n\nMean iou:{} Mean dist:{}\n".format(mean_iou,mean_d))
 
-
-
+    return mean_iou,mean_d
 
 
 
