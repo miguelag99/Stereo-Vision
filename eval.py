@@ -29,6 +29,7 @@ def eval_bird(estimations):
         labels_f = open(est.label_id,'r')
         print(est.im_id)
         for corners in est.objects:
+           
             p1 = corners[0]
             p2 = corners[1]
             p3 = corners[4]
@@ -45,6 +46,10 @@ def eval_bird(estimations):
             zc = (p1[2]+p2[2]+p3[2]+p4[2])/4
             center = [xc,zc]
     
+            min_dist = 100
+            min_iou = 2
+            
+
             for label in labels_f:
                 field = label.split(' ')
                 if field[0] != 'DontCare':
@@ -75,11 +80,18 @@ def eval_bird(estimations):
                     iou = gt_poly.intersection(est_poly).area / gt_poly.union(est_poly).area
                     
                     #Se entiende que si es el mismo objeto el iou debe ser > 0 y los centros deben estar cercanos
-                    if(iou>0 and dist < 5):
-                        i += 1
-                        print("\nIoU{} GT:{} est:{} dist:{}".format(iou,center_gt,center,dist))
-                        mean_iou += iou
-                        mean_d += dist
+                    if(dist < 5):
+                        if(dist<min_dist):
+                            min_dist = dist
+                            min_iou = iou
+                            min_center = center
+                            min_center_gt = center_gt
+
+            if(min_dist < 100 and min_iou <= 1):
+                i += 1
+                print("\nIoU{} GT:{} est:{} dist:{}".format(min_iou,min_center_gt,min_center,min_dist))
+                mean_iou += min_iou
+                mean_d += min_dist
 
         labels_f.close()
 
@@ -89,8 +101,6 @@ def eval_bird(estimations):
 
 
 
-            
-            
 
 
 

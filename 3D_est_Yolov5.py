@@ -179,7 +179,7 @@ def compare_3Dbbox():
                 location = plot_regressed_3d_bbox(im, proj_matrix, box_2d, dim, alpha, theta_ray, truth_img) #Plot the estimation
                 
                 #Only objects within z = 40m
-                if(location[2]< 20):
+                if(location[2]< 40):
                     plot_2d_box(yolo_im,box_2d) #Plot the yolo detection
                     plot_bird_view(birdview_im, dim, alpha, theta_ray,location)
 
