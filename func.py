@@ -240,13 +240,13 @@ class Model(nn.Module):
         orientation = orientation.view(-1, self.bins, 2)
         orientation = F.normalize(orientation, dim=2)
         confidence = self.confidence(x)
-        print("Raw conf:{}  ".format(confidence))
+
+        #print("Raw conf:{}  ".format(confidence))
         confidence = np.divide(confidence.cpu().detach(),self.max_conf)
-        
         sig = nn.Softmax(1)
         #sig = nn.Sigmoid()
         confidence = sig(confidence)
-        #print("Conf:{}  ".format(confidence))
+        print("Conf:{}  ".format(confidence))
 
         dimension = self.dimension(x)
         return orientation, confidence, dimension

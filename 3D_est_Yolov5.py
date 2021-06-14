@@ -180,13 +180,25 @@ def execute():
 
                 location = plot_regressed_3d_bbox(im, proj_matrix, box_2d, dim, alpha, theta_ray, truth_img) #Plot the estimation
                 
+                print("Loc:{}".format(location))
+
+                #Calcular la score ponderando con la distancia 
                 
+                conf = conf[argmax]
+                conf = conf/(1+(0.025*location[2]))
+                print("Score ponderada: {} ".format(conf))
+
+                '''
                 #Only objects within z = 40m
                 if(location[2]< z_threshold):
-                    print("Loc:{}".format(location))
-                    plot_2d_box(yolo_im,box_2d) #Plot the yolo detection
-                    plot_bird_view(birdview_im, dim, alpha, theta_ray,location)
+                    
+                    #plot_2d_box(yolo_im,box_2d) #Plot the yolo detection
+                    #plot_bird_view(birdview_im, dim, alpha, theta_ray,location)
                     #compute_draw_3D(im,label_files[i],proj_matrix) #Draw the kitti 3D bbox.
+                '''
+
+            else:
+                print("Objeto fuera de rango")
 
         t_end = time.time()
         elapsed += (t_end - t_ini)
