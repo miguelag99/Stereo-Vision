@@ -67,6 +67,8 @@ def load_model_est(dir):
 
 def execute():
 
+   
+
     z_threshold = 40
 
     dir1 = KITTI_PATH+'/image_left/'
@@ -118,23 +120,34 @@ def execute():
         yolo_im = np.copy(truth_img)
         birdview_im = np.zeros((1000,1000,3))
 
-        if(args.evaluate):
-            estimations.append(estimation(imgs[i],label_files[i]))
-        
+        print("\n\nImage:{}\n".format(imgs[i]))
+
+        labels_f = open(label_files[i],'r')
+
+        for label in labels_f:
+            field = label.split(' ')
+            if field[0] != 'DontCare':
+                center_gt = field[11:14]
+                center_gt = [float(i) for i in center_gt]  
+                print(center_gt)
+
+
 
         elem_box = detections.pred[i]
         
         for element in elem_box:
         
             name = detections.names[int(element.data[5])]
-            #print(name)
+            print(name)
             
             if int(element.data[0]) > 5 and int(element.data[2] < (im.shape[1]-5)): #Filter for cropped objects
 
                 calib_file = cal_files[i]
                 calib_file = read_params(calib_file) #Params matrix for each image
                 
-
+                #print(calib_file)
+                #print(element)
+		
                 detectedObject = DetectedObject(im, name,element, calib_file) #New class for each detection to compute theta and crop the detection
 
                 theta_ray = detectedObject.theta_ray
@@ -148,11 +161,8 @@ def execute():
 
                 input_tensor = torch.zeros([1,3,224,224]).cuda()
                 input_tensor[0,:,:,:] = input_img
-
-                
-
+            
                 [orient, conf, dim] = model(input_tensor) #Apply the model to get the estimation
-
 
                 orient = orient.cpu().data.numpy()[0, :, :]
                 conf = conf.cpu().data.numpy()[0, :]
@@ -170,18 +180,12 @@ def execute():
 
                 location = plot_regressed_3d_bbox(im, proj_matrix, box_2d, dim, alpha, theta_ray, truth_img) #Plot the estimation
                 
+                
                 #Only objects within z = 40m
                 if(location[2]< z_threshold):
+                    print("Loc:{}".format(location))
                     plot_2d_box(yolo_im,box_2d) #Plot the yolo detection
                     plot_bird_view(birdview_im, dim, alpha, theta_ray,location)
-
-                    if(args.evaluate):
-
-                            orient = alpha + theta_ray
-                            R = rotation_matrix(orient)
-                            corners = create_corners(dim, location = location, R = R)
-                            estimations[i].add_object(corners)
-
                     #compute_draw_3D(im,label_files[i],proj_matrix) #Draw the kitti 3D bbox.
 
         t_end = time.time()
@@ -207,6 +211,9 @@ def execute():
     
     elapsed = elapsed/len(imgs)
     print("Est_time:\nAvg sec per image: {}\nMax:{} Min:{}\n".format(elapsed,max_t,min_t))
+
+ 
+    
     
         
 
