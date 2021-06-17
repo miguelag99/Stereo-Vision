@@ -246,7 +246,7 @@ class Model(nn.Module):
         sig = nn.Softmax(1)
         #sig = nn.Sigmoid()
         confidence = sig(confidence)
-        print("Conf:{}  ".format(confidence))
+        
 
         dimension = self.dimension(x)
         return orientation, confidence, dimension

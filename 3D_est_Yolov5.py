@@ -67,9 +67,7 @@ def load_model_est(dir):
 
 def execute():
 
-   
-
-    z_threshold = 40
+    conf_threshold = 0.45
 
     dir1 = KITTI_PATH+'/image_left/'
     dir2 = KITTI_PATH+'/camera_param/calib/'
@@ -123,6 +121,10 @@ def execute():
         print("\n\nImage:{}\n".format(imgs[i]))
 
         labels_f = open(label_files[i],'r')
+        
+        
+        
+        
 
         for label in labels_f:
             field = label.split(' ')
@@ -186,20 +188,23 @@ def execute():
                 
                 conf = conf[argmax]
                 conf = conf/(1+(0.025*location[2]))
-                print("Score ponderada: {} ".format(conf))
 
-                '''
-                #Only objects within z = 40m
-                if(location[2]< z_threshold):
+                
+                if(conf> conf_threshold):
                     
+                    file_name = SAVE_PATH+"/"+label_files[i].split("/")[7]
+                    detection_2_file(file_name,name,theta_ray,element.data,dim,location,alpha,conf)
+
                     #plot_2d_box(yolo_im,box_2d) #Plot the yolo detection
                     #plot_bird_view(birdview_im, dim, alpha, theta_ray,location)
                     #compute_draw_3D(im,label_files[i],proj_matrix) #Draw the kitti 3D bbox.
-                '''
+                
 
             else:
                 print("Objeto fuera de rango")
 
+        
+        
         t_end = time.time()
         elapsed += (t_end - t_ini)
         if((t_end - t_ini) > max_t):
@@ -235,7 +240,7 @@ def eval_Kitti():
     im_per_batch = 50
     kitti_iou = 0
     kitti_d = 0
-    z_threshold = 40
+    conf_threshold = 0.45
     max_time = 0
 
     dir1 = KITTI_PATH+'/image_left/'
@@ -321,13 +326,20 @@ def eval_Kitti():
 
                     location = plot_regressed_3d_bbox(im, proj_matrix, box_2d, dim, alpha, theta_ray, truth_img) #Plot the estimation
                     
+                    conf = conf[argmax]
+                    conf = conf/(1+(0.025*location[2]))
+
                     #Only objects within z = 40m
-                    if(location[2]< z_threshold):
+                    if(conf> conf_threshold):
   
+                        file_name = SAVE_PATH+"/"+label_files[i].split("/")[7]
+                        detection_2_file(file_name,name,theta_ray,element.data,dim,location,alpha,conf)
+
                         orient = alpha + theta_ray
                         R = rotation_matrix(orient)
                         corners = create_corners(dim, location = location, R = R)
                         estimations[i].add_object(corners)
+
             t_end = time.time()
 
             if((t_end - t_ini) > max_time):
