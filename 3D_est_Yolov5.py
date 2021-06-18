@@ -183,21 +183,22 @@ def execute():
                 location = plot_regressed_3d_bbox(im, proj_matrix, box_2d, dim, alpha, theta_ray, truth_img) #Plot the estimation
                 
                 print("Loc:{}".format(location))
+                print("Theta_ray:{} Orient:{} Alpha:{}".format(theta_ray,orient,alpha))
 
                 #Calcular la score ponderando con la distancia 
                 
                 conf = conf[argmax]
                 conf = conf/(1+(0.025*location[2]))
 
-                
+                file_name = SAVE_PATH+"/"+label_files[i].split("/")[7]
+                detection_2_file(file_name,name,theta_ray,element.data,dim,location,alpha,conf,conf_threshold)
+                '''
                 if(conf> conf_threshold):
-                    
-                    file_name = SAVE_PATH+"/"+label_files[i].split("/")[7]
-                    detection_2_file(file_name,name,theta_ray,element.data,dim,location,alpha,conf)
-
+         
                     #plot_2d_box(yolo_im,box_2d) #Plot the yolo detection
                     #plot_bird_view(birdview_im, dim, alpha, theta_ray,location)
                     #compute_draw_3D(im,label_files[i],proj_matrix) #Draw the kitti 3D bbox.
+                '''
                 
 
             else:
@@ -329,12 +330,11 @@ def eval_Kitti():
                     conf = conf[argmax]
                     conf = conf/(1+(0.025*location[2]))
 
-                    #Only objects within z = 40m
+                    file_name = SAVE_PATH+"/"+label_files[i].split("/")[7]
+                    detection_2_file(file_name,name,theta_ray,element.data,dim,location,alpha,conf,conf_threshold)
+
                     if(conf> conf_threshold):
   
-                        file_name = SAVE_PATH+"/"+label_files[i].split("/")[7]
-                        detection_2_file(file_name,name,theta_ray,element.data,dim,location,alpha,conf)
-
                         orient = alpha + theta_ray
                         R = rotation_matrix(orient)
                         corners = create_corners(dim, location = location, R = R)
