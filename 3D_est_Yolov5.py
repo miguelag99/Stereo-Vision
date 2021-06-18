@@ -357,7 +357,7 @@ def eval_Kitti():
             kitti_d = (batch_d+kitti_d)/2
         print("Accumulated mean Iou: {} and accumulated mean dist: {}".format(kitti_iou,kitti_d))
 
-    print("Se han analizado {} imagenes con una z max de {}, obteniendo Mean IoU: {} , Mean dist: {} y t_max de ejecución del estimador de {}".format(n_batch*im_per_batch,z_threshold, kitti_iou, kitti_d,max_time))
+    print("Se han analizado {} imagenes con una conf min de {}, obteniendo Mean IoU: {} , Mean dist: {} y t_max de ejecución del estimador de {}".format(n_batch*im_per_batch,conf_threshold, kitti_iou, kitti_d,max_time))
 
 
 

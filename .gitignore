@@ -5,7 +5,7 @@ Datasets_*/
 *.png
 *.pkl
 /ultralytics_yolov5_master/
-
+/results/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
