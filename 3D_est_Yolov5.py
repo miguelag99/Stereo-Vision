@@ -28,7 +28,7 @@ def Yolo5_det(imgs,model):
 
     # Images
     model.classes = [0,1,2,3,5,7] #Person(0),bicycle(1),car(2),motorcycle(3),bus(5),truck(7),traffic light(9),stop(11)
-    model.conf = 0.7
+    model.conf = 0.3
     #Adding classes = n in torch.hub.load will change the output layers (must retrain with the new number of classes)
 
     t_ini = time.time()
@@ -73,8 +73,7 @@ def execute():
     dir2 = KITTI_PATH+'/camera_param/calib/'
     dir3 = KITTI_PATH+'/label_2/'
 
-    if not os.path.exists(SAVE_PATH):
-        os.makedirs(SAVE_PATH)
+
 
     names = sorted(os.listdir(dir1))
     par = sorted(os.listdir(dir2))
@@ -192,6 +191,8 @@ def execute():
 
                 file_name = SAVE_PATH+"/"+label_files[i].split("/")[7]
                 detection_2_file(file_name,name,theta_ray,element.data,dim,location,alpha,conf,conf_threshold)
+
+                
                 '''
                 if(conf> conf_threshold):
          
@@ -247,9 +248,6 @@ def eval_Kitti():
     dir1 = KITTI_PATH+'/image_left/'
     dir2 = KITTI_PATH+'/camera_param/calib/'
     dir3 = KITTI_PATH+'/label_2/'
-
-    if not os.path.exists(SAVE_PATH):
-        os.makedirs(SAVE_PATH)
 
     names = sorted(os.listdir(dir1))
     par = sorted(os.listdir(dir2))
@@ -370,6 +368,10 @@ if __name__ == "__main__":
     parser.add_argument("-end","--number_end",help ="Num de imagen final",type =int)
     parser.add_argument("-eval","--evaluate",help="Evaluar estimacion",action="store_true")
     args = parser.parse_args()
+    
+    os.system("rm -rf "+SAVE_PATH)
+    os.makedirs(SAVE_PATH)
+    create_save_files(source_path="/home/miguel/TFG/Stereo-Vision/Datasets_kitti/label_2",dest_path="/home/miguel/TFG/Stereo-Vision/results")
 
     if(args.evaluate):
         print("Evaluación sobre Kitti")
