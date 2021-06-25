@@ -192,14 +192,13 @@ def execute():
                 file_name = SAVE_PATH+"/"+label_files[i].split("/")[7]
                 detection_2_file(file_name,name,theta_ray,element.data,dim,location,alpha,conf,conf_threshold)
 
-                
-                '''
+                plot_2d_box(yolo_im,box_2d) #Plot the yolo detection
+               
                 if(conf> conf_threshold):
-         
-                    #plot_2d_box(yolo_im,box_2d) #Plot the yolo detection
-                    #plot_bird_view(birdview_im, dim, alpha, theta_ray,location)
-                    #compute_draw_3D(im,label_files[i],proj_matrix) #Draw the kitti 3D bbox.
-                '''
+                             
+                    plot_bird_view(birdview_im, dim, alpha, theta_ray,location)
+                    compute_draw_3D(im,label_files[i],proj_matrix) #Draw the kitti 3D bbox.
+                
                 
 
             else:
@@ -219,9 +218,9 @@ def execute():
         
         #cv2.imshow("{}".format(i),im)
         #cv2.imshow("{}_birdview".format(i),birdview_im)
-        #cv2.imwrite(SAVE_PATH+"/{}.png".format(i),im)
-        #cv2.imwrite(SAVE_PATH+"/{}_yolo.png".format(i),yolo_im)
-        #cv2.imwrite(SAVE_PATH+"/{}_bird.png".format(i),birdview_im)
+        cv2.imwrite(SAVE_PATH+"/{}.png".format(i),im)
+        cv2.imwrite(SAVE_PATH+"/{}_yolo.png".format(i),yolo_im)
+        cv2.imwrite(SAVE_PATH+"/{}_bird.png".format(i),birdview_im)
 
     
 
@@ -371,9 +370,10 @@ if __name__ == "__main__":
     
     os.system("rm -rf "+SAVE_PATH)
     os.makedirs(SAVE_PATH)
-    create_save_files(source_path="/home/miguel/TFG/Stereo-Vision/Datasets_kitti/label_2",dest_path="/home/miguel/TFG/Stereo-Vision/results")
+    
 
     if(args.evaluate):
+        create_save_files(source_path="/home/miguel/TFG/Stereo-Vision/Datasets_kitti/label_2",dest_path="/home/miguel/TFG/Stereo-Vision/results")
         print("Evaluación sobre Kitti")
         eval_Kitti()
     else:
