@@ -184,6 +184,8 @@ def execute():
                 print("Loc:{}".format(location))
                 print("Theta_ray:{} Orient:{} Alpha:{}".format(theta_ray,orient,alpha))
 
+                # Alpha es el ángulo que forma la unión del centro del objeto a la cámara con el eje x
+
                 #Calcular la score ponderando con la distancia 
                 
                 conf = conf[argmax]
@@ -216,11 +218,11 @@ def execute():
         
         cv2.putText(birdview_im,"{:.4f} s".format(t_end - t_ini),(50,birdview_im.shape[1]-50),cv2.FONT_HERSHEY_SIMPLEX,1,cv_colors.RED.value,1)
         
-        #cv2.imshow("{}".format(i),im)
+        cv2.imshow("{}".format(i),im)
         #cv2.imshow("{}_birdview".format(i),birdview_im)
-        cv2.imwrite(SAVE_PATH+"/{}.png".format(i),im)
-        cv2.imwrite(SAVE_PATH+"/{}_yolo.png".format(i),yolo_im)
-        cv2.imwrite(SAVE_PATH+"/{}_bird.png".format(i),birdview_im)
+        #cv2.imwrite(SAVE_PATH+"/{}.png".format(i),im)
+        #cv2.imwrite(SAVE_PATH+"/{}_yolo.png".format(i),yolo_im)
+        #cv2.imwrite(SAVE_PATH+"/{}_bird.png".format(i),birdview_im)
 
     
 
@@ -329,6 +331,8 @@ def eval_Kitti():
 
                     file_name = SAVE_PATH+"/"+label_files[i].split("/")[7]
                     detection_2_file(file_name,name,theta_ray,element.data,dim,location,alpha,conf,conf_threshold)
+
+                    print
 
                     if(conf> conf_threshold):
   
