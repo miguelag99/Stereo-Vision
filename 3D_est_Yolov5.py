@@ -218,7 +218,7 @@ def execute():
         
         cv2.putText(birdview_im,"{:.4f} s".format(t_end - t_ini),(50,birdview_im.shape[1]-50),cv2.FONT_HERSHEY_SIMPLEX,1,cv_colors.RED.value,1)
         
-        cv2.imshow("{}".format(i),im)
+        #cv2.imshow("{}".format(i),im)
         #cv2.imshow("{}_birdview".format(i),birdview_im)
         #cv2.imwrite(SAVE_PATH+"/{}.png".format(i),im)
         #cv2.imwrite(SAVE_PATH+"/{}_yolo.png".format(i),yolo_im)
@@ -330,9 +330,7 @@ def eval_Kitti():
                     conf = conf/(1+(0.025*location[2]))
 
                     file_name = SAVE_PATH+"/"+label_files[i].split("/")[7]
-                    detection_2_file(file_name,name,theta_ray,element.data,dim,location,alpha,conf,conf_threshold)
-
-                    print
+                    detection_2_file(file_name,name,theta_ray,element.data,dim,location,alpha,conf)
 
                     if(conf> conf_threshold):
   
