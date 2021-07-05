@@ -17,13 +17,18 @@ def detection_2_file(f_name,name,theta_ray,bbox,dim,location,alpha,conf):
         name = "Pedestrian"
     if(name=="bicycle"):
         name = "Bike"
-
+    if(name=="car"):
+        name = "Car"
+    if(name=="truck"):
+        name = "Truck"
+    if(name=="motorcycle"):
+        name = "Motorcycle"
     res_file.write("{} -1 -1 {:.2f} {:.2f} {:.2f} {:.2f} {:.2f} {:.2f} {:.2f} {:.2f} {:.2f} {:.2f} {:.2f} {:.2f} {:.2f}".format(\
         name,alpha,bbox[0],bbox[1],bbox[2],bbox[3],\
         dim[0],dim[1],dim[2],location[0],location[1],location[2],alpha+theta_ray,conf)+os.linesep)
  
 
-    res_file.close(f_name,name,theta_ray,bbox,dim,location,alpha,conf)
+    res_file.close()
 
 
 

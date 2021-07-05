@@ -49,9 +49,42 @@ def kitti_2_csv(label_path):
 def est_2_csv(est_path):
 
     files = sorted(os.listdir(est_path))
-
-
     col = ['frame','id','type','alpha','left','top','right','bottom','h','w','l','x','y','z','rotation_z','vx','vy','timestamp','score']
+    df = pandas.DataFrame([],columns=col)
+    timestamp = 0
+
+    for f in files:
+
+        print(timestamp)
+
+        id = 0
+
+        labels_f = open(RESULTS+f,'r')
+
+        for label in labels_f:
+
+            field = label.split(' ')
+
+            if field[0] != 'DontCare':
+ 
+                frame = 0
+           
+                type = field[0]
+                alpha = field[3]
+                (left,top,right,bottom) = (field[4],field[5],field[6],field[7])
+                (h,w,l) = (field[8],field[9],field[10])
+                (x,y,z) = (field[11],field[12],field[13])
+                rotation_z = field[14] #Rotation y axis in camera
+                score = field[15].split('\n')[0]
+            
+                a = pandas.DataFrame([[frame,id,type,alpha,left,top,right,bottom,h,w,l,x,y,z,rotation_z,0,0,timestamp,score]],columns=col)
+                df = pandas.concat([df,a],axis=0)
+                id = id +1
+        timestamp = timestamp +1
+        labels_f.close()
+    
+    df.to_csv('detections.csv',columns=col,index=False)
+
 
 if __name__ == "__main__":
 
