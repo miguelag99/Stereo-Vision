@@ -26,8 +26,17 @@ def kitti_2_csv(label_path):
 
             if field[0] != 'DontCare':
 
+                if field[0] == "Misc" or field[0] == "Van" or field[0] == "Tram":
+                    type = "Other_Vehicle"
+                elif field[0] == "Cyclist" :
+                    type = "Bike"
+                elif field[0] == "Person_sitting":
+                    type = "Pedestrian"
+                else:
+                    type = field[0]
+
                 frame = 0
-                type = field[0]
+                
                 alpha = field[3]
                 (left,top,right,bottom) = (field[4],field[5],field[6],field[7])
                 (h,w,l) = (field[8],field[9],field[10])
@@ -68,8 +77,11 @@ def est_2_csv(est_path):
             if field[0] != 'DontCare':
  
                 frame = 0
-           
-                type = field[0]
+                if field[0] == "bus":
+                    type = "Other_Vehicle"
+                else:
+                    type = field[0]
+             
                 alpha = field[3]
                 (left,top,right,bottom) = (field[4],field[5],field[6],field[7])
                 (h,w,l) = (field[8],field[9],field[10])
