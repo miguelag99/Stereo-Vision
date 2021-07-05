@@ -79,6 +79,8 @@ def est_2_csv(est_path):
                 frame = 0
                 if field[0] == "bus":
                     type = "Other_Vehicle"
+                elif field[0] == "car":
+                    type == "Car"
                 else:
                     type = field[0]
              
