@@ -120,7 +120,6 @@ def project_3d_pt(pt, cam_to_img, calib_file=None):
 
     point = np.array(pt)
     point = np.append(point, 1)
-
     point = np.dot(cam_to_img, point)
     # point = np.dot(np.dot(np.dot(cam_to_img, R0_rect), Tr_velo_to_cam), point)
 
@@ -160,7 +159,7 @@ def plot_3d_box(img, cam_to_img, ry, dimension, center):
     corners = create_corners(dimension, location=center, R=R)
   
     # to see the corners on image as red circles
-    # plot_3d_pts(img, corners, center,cam_to_img=cam_to_img, relative=False)
+    plot_3d_pts(img, corners, center,cam_to_img=cam_to_img, relative=False)
 
     box_3d = []
     for corner in corners:
@@ -362,11 +361,11 @@ def calc_location(dimension, proj_matrix, box_2d, alpha, theta_ray):
         for row, index in enumerate(indicies):
             X = X_array[row]
             M = M_array[row]
-
+            
             # create M for corner Xx
             RX = np.dot(R, X)
             M[:3,3] = RX.reshape(3)
-
+          
             M = np.dot(proj_matrix, M)
 
             A[row, :] = M[index,:3] - box_corners[row] * M[2,:3]

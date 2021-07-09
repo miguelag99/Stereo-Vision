@@ -28,7 +28,7 @@ def Yolo5_det(imgs,model):
 
     # Images
     model.classes = [0,1,2,3,5,7] #Person(0),bicycle(1),car(2),motorcycle(3),bus(5),truck(7),traffic light(9),stop(11)
-    model.conf = 0.3
+    model.conf = 0.6
     #Adding classes = n in torch.hub.load will change the output layers (must retrain with the new number of classes)
 
     t_ini = time.time()
@@ -73,9 +73,9 @@ def execute():
     dir2 = KITTI_PATH+'/camera_param/calib/'
     dir3 = KITTI_PATH+'/label_2/'
 
-
-
+ 
     names = sorted(os.listdir(dir1))
+    print(names[0:len(names)-1])
     par = sorted(os.listdir(dir2))
     gt = sorted(os.listdir(dir3))
 
@@ -90,10 +90,7 @@ def execute():
     
 
     imgs = [dir1 + name for name in names[args.number_init:args.number_end]]  # batch of images
-    
-
-    #print(imgs) 
-    
+      
     #detections.show()
     #detections.save()
 
@@ -119,21 +116,6 @@ def execute():
 
         print("\n\nImage:{}\n".format(imgs[i]))
 
-        labels_f = open(label_files[i],'r')
-        
-        
-        
-        
-
-        for label in labels_f:
-            field = label.split(' ')
-            if field[0] != 'DontCare':
-                center_gt = field[11:14]
-                center_gt = [float(i) for i in center_gt]  
-                print(center_gt)
-
-
-
         elem_box = detections.pred[i]
         
         for element in elem_box:
@@ -145,6 +127,8 @@ def execute():
 
                 calib_file = cal_files[i]
                 calib_file = read_params(calib_file) #Params matrix for each image
+
+                # calib_file = np.vstack(([671.5123291015625, 0.0, 664.2958374023438, 0.0],[0.0, 671.5123291015625, 347.06634521484375, 0.0],[0.0, 0.0, 1.0, 0.0]))
                 
                 #print(calib_file)
                 #print(element)
@@ -154,8 +138,7 @@ def execute():
                 theta_ray = detectedObject.theta_ray
                 input_img = detectedObject.img
                 proj_matrix = detectedObject.proj_matrix
-                       
-
+          
                 detected_Class = name
                 
                 box_2d = [(int(element[0].item()),int(element[1].item())),(int(element[2].item()),int(element[3].item()))] #2D Bbox as a topule of points
@@ -181,8 +164,8 @@ def execute():
 
                 location = plot_regressed_3d_bbox(im, proj_matrix, box_2d, dim, alpha, theta_ray, truth_img) #Plot the estimation
                 
-                print("Loc:{}".format(location))
-                print("Theta_ray:{} Orient:{} Alpha:{}".format(theta_ray,orient,alpha))
+                # print("Loc:{}".format(location))
+                # print("Theta_ray:{} Orient:{} Alpha:{}".format(theta_ray,orient,alpha))
 
                 # Alpha es el ángulo que forma la unión del centro del objeto a la cámara con el eje x
 
@@ -192,9 +175,10 @@ def execute():
                 conf = conf/(1+(0.025*location[2]))
 
                 file_name = SAVE_PATH+"/"+label_files[i].split("/")[7]
-                detection_2_file(file_name,name,theta_ray,element.data,dim,location,alpha,conf,conf_threshold)
+                # file_name = SAVE_PATH+"/"+"{:010d}.txt".format(i)
+                detection_2_file(file_name,name,theta_ray,element.data,dim,location,alpha,conf)
 
-                plot_2d_box(yolo_im,box_2d) #Plot the yolo detection
+                #plot_2d_box(yolo_im,box_2d) #Plot the yolo detection
                
                 if(conf> conf_threshold):
                              
@@ -220,7 +204,7 @@ def execute():
         
         #cv2.imshow("{}".format(i),im)
         #cv2.imshow("{}_birdview".format(i),birdview_im)
-        #cv2.imwrite(SAVE_PATH+"/{}.png".format(i),im)
+        cv2.imwrite(SAVE_PATH+"/{}.png".format(i),im)
         #cv2.imwrite(SAVE_PATH+"/{}_yolo.png".format(i),yolo_im)
         #cv2.imwrite(SAVE_PATH+"/{}_bird.png".format(i),birdview_im)
 

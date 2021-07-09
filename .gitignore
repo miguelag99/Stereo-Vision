@@ -6,6 +6,7 @@ Datasets_*/
 *.pkl
 /ultralytics_yolov5_master/
 /results/
+/gt_rosbag/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -23,14 +23,14 @@ def kitti_2_csv(label_path):
         for label in labels_f:
 
             field = label.split(' ')
-
-            if field[0] != 'DontCare':
+            if field[0] == 'Car' or field[0] == 'Pedestrian': 
+            #if field[0] != 'DontCare':
 
                 if field[0] == "Misc" or field[0] == "Van" or field[0] == "Tram":
                     type = "Other_Vehicle"
-                elif field[0] == "Cyclist" :
+                elif field[0] == "Cyclist" or field[0] == "cyclist":
                     type = "Bike"
-                elif field[0] == "Person_sitting":
+                elif field[0] == "Person_sitting" or field[0] == "person_sitting":
                     type = "Pedestrian"
                 else:
                     type = field[0]
@@ -54,6 +54,7 @@ def kitti_2_csv(label_path):
 
 
 
+# Cambiar nombres de hwl y gurardar vz = 0
 
 def est_2_csv(est_path):
 
@@ -75,12 +76,16 @@ def est_2_csv(est_path):
             field = label.split(' ')
 
             if field[0] != 'DontCare':
- 
+            #if field[0] == 'car' or field[0] == 'Pedestrian':   
                 frame = 0
-                if field[0] == "bus":
+                if field[0] == "bus" or field[0] == "Bus":
                     type = "Other_Vehicle"
                 elif field[0] == "car":
-                    type == "Car"
+                    type = "Car"
+                elif field[0] == "truck":
+                    type = "Truck"
+                elif field[0] == "motorcycle":
+                    type = "Motorcycle"
                 else:
                     type = field[0]
              
