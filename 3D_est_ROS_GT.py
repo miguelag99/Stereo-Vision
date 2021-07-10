@@ -93,7 +93,7 @@ def detect_ROS():
     angle_bins = generate_bins(2)
     model = load_model_est(WEIGHTS_PATH)
 
-    col = ['frame','timestamp','id','type','alpha','left','top','right','bottom','size_x','size_y','size_z','x','y','z','rotation_z','vx','vy']
+    col = ['frame','timestamp','id','type','alpha','left','top','right','bottom','size_x','size_y','size_z','x','y','z','rotation_z','vx','vy','score']
     df = pandas.DataFrame([],columns=col)
 
     for b in range(n_batch.astype(int)):
@@ -181,9 +181,8 @@ def detect_ROS():
                      
                         orient = (alpha + theta_ray).cpu()
                         a = pandas.DataFrame([[((b*im_per_batch)+i),t,id,name,alpha,box_2d[0][0],box_2d[0][1],box_2d[1][0],box_2d[1][1]\
-                            ,dim[2],dim[1],dim[0],location[2]-l_off,-location[0],-(location[1]+h_off),orient.item(),0,0]],columns=col)
+                            ,dim[2],dim[1],dim[0],location[2]-l_off,-location[0],-(location[1]+h_off),orient.item(),0,0,conf]],columns=col)
                         df = pandas.concat([df,a],axis=0)
-                        print(id)
                         id = id + 1
 
     df.to_csv('ROS_det.csv',columns=col,index=False)
