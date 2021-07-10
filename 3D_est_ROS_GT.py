@@ -67,7 +67,7 @@ def load_model_est(dir):
 
 def detect_ROS():
 
-    im_per_batch = 100
+    im_per_batch = 15
     conf_threshold = 0.4
   
     # Camera offset
@@ -165,30 +165,30 @@ def detect_ROS():
 
                     location = plot_regressed_3d_bbox(im, proj_matrix, box_2d, dim, alpha, theta_ray, truth_img) #Plot the estimation
 
-                    print("Loc:{}".format(location))
+                    # print("Loc:{}".format(location))
                     
                     conf = conf[argmax]
                     conf = conf/(1+(0.025*location[2]))
 
-                    if (b==0):
+                    # Print 2D and 3D estimations of a det batch
 
-                        plot_2d_box(im,box_2d) #Plot the yolo detection
-                        cv2.imshow("{}".format(i),im)
+                    # if (b==0):
+
+                    #     plot_2d_box(im,box_2d) #Plot the yolo detection
+                    #     cv2.imshow("{}".format(i),im)
 
                     if(conf> conf_threshold):
                      
-                        
-
                         orient = (alpha + theta_ray).cpu()
                         a = pandas.DataFrame([[((b*im_per_batch)+i),t,id,name,alpha,box_2d[0][0],box_2d[0][1],box_2d[1][0],box_2d[1][1]\
-                            ,dim[2],dim[1],dim[0],location[2]-l_off,-location[0],-(location[1]+h_off),orient,0,0]],columns=col)
+                            ,dim[2],dim[1],dim[0],location[2]-l_off,-location[0],-(location[1]+h_off),orient.item(),0,0]],columns=col)
                         df = pandas.concat([df,a],axis=0)
-
-                id = id + 1
+                        print(id)
+                        id = id + 1
 
     df.to_csv('ROS_det.csv',columns=col,index=False)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
        
 
