@@ -167,7 +167,7 @@ def execute():
                 # print("Loc:{}".format(location))
                 # print("Theta_ray:{} Orient:{} Alpha:{}".format(theta_ray,orient,alpha))
 
-                # Alpha es el ángulo que forma la unión del centro del objeto a la cámara con el eje x
+                # Alpha es el ángulo que forma la unión del centro del objeto a la cámara con el eje x 
 
                 #Calcular la score ponderando con la distancia 
                 
