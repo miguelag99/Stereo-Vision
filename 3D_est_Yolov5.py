@@ -122,7 +122,8 @@ def execute():
         for element in elem_box:
         
             name = detections.names[int(element.data[5])]
-            #print(name)
+            yolo_conf = element[4]
+
             
             if int(element.data[0]) > 5 and int(element.data[2] < (im.shape[1]-5)): #Filter for cropped objects
 
@@ -146,17 +147,18 @@ def execute():
 
                 input_tensor = torch.zeros([1,3,224,224]).cuda()
                 input_tensor[0,:,:,:] = input_img
-            
+                
                 [orient, conf, dim] = model(input_tensor) #Apply the model to get the estimation
 
                 orient = orient.cpu().data.numpy()[0, :, :]
                 conf = conf.cpu().data.numpy()[0, :]
-                conf = max(conf)*0.8
+                
                 dim = dim.cpu().data.numpy()[0, :]
                 
                 dim += averages.get_item(detected_Class)
 
                 argmax = np.argmax(conf)
+                conf = conf[argmax]
                 orient = orient[argmax, :]
                 cos = orient[0]
                 sin = orient[1]
@@ -173,8 +175,9 @@ def execute():
 
                 #Calcular la score ponderando con la distancia 
                 
-                # conf = conf[argmax]
-                # conf = conf/(1+(0.025*location[2]))
+                if conf > 0.8:
+                    
+                    conf = pow((1.5*conf-0.5),3)
 
                 file_name = SAVE_PATH+"/"+label_files[i].split("/")[7]
                 # file_name = SAVE_PATH+"/"+"{:010d}.txt".format(i)

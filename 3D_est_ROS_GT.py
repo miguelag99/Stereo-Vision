@@ -33,13 +33,14 @@ def Yolo5_det(imgs,model):
 
     # Images
     model.classes = [0,1,2,3,5,7] #Person(0),bicycle(1),car(2),motorcycle(3),bus(5),truck(7),traffic light(9),stop(11)
-    model.conf = 0.1
+    model.conf = 0.15
     #Adding classes = n in torch.hub.load will change the output layers (must retrain with the new number of classes)
 
     t_ini = time.time()
 
     # Inference
     results = model(imgs)
+    #print(results)
     #print(results.pred)
     #print('\n')
 
@@ -124,10 +125,15 @@ def detect_ROS():
             im = np.copy(truth_img)
     
             elem_box = detections.pred[i]
+           
             
             for element in elem_box:
             
                 name = detections.names[int(element.data[5])]
+                yolo_conf = element[4].cpu()
+                yolo_conf = yolo_conf.item()
+
+                
                 if int(element.data[0]) > 5 and int(element.data[2] < (im.shape[1]-5)): #Filter for cropped objects
 
                     detectedObject = DetectedObject(im, name,element, intrinsic) #New class for each detection to compute theta and crop the detection
@@ -147,12 +153,13 @@ def detect_ROS():
 
                     orient = orient.cpu().data.numpy()[0, :, :]
                     conf = conf.cpu().data.numpy()[0, :]
-                    conf = max(conf)*0.8
+                   
                     dim = dim.cpu().data.numpy()[0, :]
                     
                     dim += averages.get_item(detected_Class)
 
                     argmax = np.argmax(conf)
+                    conf = conf[argmax]
                     orient = orient[argmax, :]
                     cos = orient[0]
                     sin = orient[1]
@@ -171,8 +178,9 @@ def detect_ROS():
 
                     # print("Loc:{}".format(location))
                     
-                    # conf = conf[argmax]
-                    # conf = conf/(1+(0.1*location[2]))
+                    # if conf > 0.8:
+                       
+                    #     conf = pow((1.5*conf-0.5),3)
 
                     # Print 2D and 3D estimations of a det batch
 
@@ -186,7 +194,7 @@ def detect_ROS():
                      
                         orient = (alpha + theta_ray).cpu()
                         a = pandas.DataFrame([[((b*im_per_batch)+i),t,id,name,alpha,box_2d[0][0],box_2d[0][1],box_2d[1][0],box_2d[1][1]\
-                            ,dim[0],dim[1],dim[2],location[2],-location[0],-location[1],orient.item(),0,0,conf]],columns=col)
+                            ,dim[0],dim[1],dim[2],location[2],-location[0],-location[1],orient.item(),0,0,yolo_conf]],columns=col)
                         df = pandas.concat([df,a],axis=0)
                         id = id + 1
 
