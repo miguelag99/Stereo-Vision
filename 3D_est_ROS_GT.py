@@ -16,9 +16,12 @@ from torchvision.models import vgg
 
 
 WORK_PATH = os.getcwd()
-GT_PATH = os.getcwd()+'/gt_rosbag/camera/'
+# GT_PATH = os.getcwd()+'/gt_rosbag/camera/'
+GT_PATH = "/home/miguel/shared_home/perception/camera/"
 WEIGHTS_PATH = os.getcwd()+'/weights_3D_est'
-SAVE_PATH = os.getcwd()+'/results_ROS'
+# SAVE_PATH = os.getcwd()+'/results_ROS'
+
+
 
 from func import *
 from plotting import *
@@ -30,7 +33,7 @@ def Yolo5_det(imgs,model):
 
     # Images
     model.classes = [0,1,2,3,5,7] #Person(0),bicycle(1),car(2),motorcycle(3),bus(5),truck(7),traffic light(9),stop(11)
-    model.conf = 0.6
+    model.conf = 0.1
     #Adding classes = n in torch.hub.load will change the output layers (must retrain with the new number of classes)
 
     t_ini = time.time()
@@ -144,6 +147,7 @@ def detect_ROS():
 
                     orient = orient.cpu().data.numpy()[0, :, :]
                     conf = conf.cpu().data.numpy()[0, :]
+                    conf = max(conf)*0.8
                     dim = dim.cpu().data.numpy()[0, :]
                     
                     dim += averages.get_item(detected_Class)
@@ -167,8 +171,8 @@ def detect_ROS():
 
                     # print("Loc:{}".format(location))
                     
-                    conf = conf[argmax]
-                    conf = conf/(1+(0.025*location[2]))
+                    # conf = conf[argmax]
+                    # conf = conf/(1+(0.1*location[2]))
 
                     # Print 2D and 3D estimations of a det batch
 
@@ -177,11 +181,12 @@ def detect_ROS():
                     #     plot_2d_box(im,box_2d) #Plot the yolo detection
                     #     cv2.imshow("{}".format(i),im)
 
-                    if(conf> conf_threshold):
+                    # if(conf> conf_threshold):
+                    if(conf> 0):
                      
                         orient = (alpha + theta_ray).cpu()
                         a = pandas.DataFrame([[((b*im_per_batch)+i),t,id,name,alpha,box_2d[0][0],box_2d[0][1],box_2d[1][0],box_2d[1][1]\
-                            ,dim[0],dim[1],dim[2],location[2]-l_off,-location[0],-(location[1]-h_off),orient.item(),0,0,conf]],columns=col)
+                            ,dim[0],dim[1],dim[2],location[2],-location[0],-location[1],orient.item(),0,0,conf]],columns=col)
                         df = pandas.concat([df,a],axis=0)
                         id = id + 1
 

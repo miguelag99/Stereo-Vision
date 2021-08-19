@@ -159,7 +159,7 @@ def plot_3d_box(img, cam_to_img, ry, dimension, center):
     corners = create_corners(dimension, location=center, R=R)
   
     # to see the corners on image as red circles
-    plot_3d_pts(img, corners, center,cam_to_img=cam_to_img, relative=False)
+    #plot_3d_pts(img, corners, center,cam_to_img=cam_to_img, relative=False)
 
     box_3d = []
     for corner in corners:

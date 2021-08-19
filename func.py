@@ -196,9 +196,6 @@ def OrientationLoss(orient_batch, orientGT_batch, confGT_batch):
 class Model(nn.Module):
     def __init__(self, features=None, bins=2, w = 0.4):
         super(Model, self).__init__()
-        #self.max_conf = 21
-        self.max_conf = 10
-
         self.bins = bins
         self.w = w
         self.features = features
@@ -219,7 +216,7 @@ class Model(nn.Module):
                     nn.ReLU(True),
                     nn.Dropout(),
                     nn.Linear(256, bins),
-                    #nn.Softmax(1)
+                    nn.Softmax(1)
                     #nn.Sigmoid()
                 )
         self.dimension = nn.Sequential(
@@ -240,12 +237,8 @@ class Model(nn.Module):
         orientation = orientation.view(-1, self.bins, 2)
         orientation = F.normalize(orientation, dim=2)
         confidence = self.confidence(x)
+        #confidence = confidence.cpu().detach()
 
-        #print("Raw conf:{}  ".format(confidence))
-        confidence = np.divide(confidence.cpu().detach(),self.max_conf)
-        sig = nn.Softmax(1)
-        #sig = nn.Sigmoid()
-        confidence = sig(confidence)
         
 
         dimension = self.dimension(x)

@@ -75,7 +75,7 @@ def execute():
 
  
     names = sorted(os.listdir(dir1))
-    print(names[0:len(names)-1])
+    #print(names[0:len(names)-1])
     par = sorted(os.listdir(dir2))
     gt = sorted(os.listdir(dir3))
 
@@ -110,18 +110,19 @@ def execute():
         t_ini = time.time()
 
         truth_img = cv2.imread(imgs[i])
+        gt_im = np.copy(truth_img)
         im = np.copy(truth_img)
         yolo_im = np.copy(truth_img)
         birdview_im = np.zeros((1000,1000,3))
 
-        print("\n\nImage:{}\n".format(imgs[i]))
+        #print("\n\nImage:{}\n".format(imgs[i]))
 
         elem_box = detections.pred[i]
         
         for element in elem_box:
         
             name = detections.names[int(element.data[5])]
-            print(name)
+            #print(name)
             
             if int(element.data[0]) > 5 and int(element.data[2] < (im.shape[1]-5)): #Filter for cropped objects
 
@@ -150,6 +151,7 @@ def execute():
 
                 orient = orient.cpu().data.numpy()[0, :, :]
                 conf = conf.cpu().data.numpy()[0, :]
+                conf = max(conf)*0.8
                 dim = dim.cpu().data.numpy()[0, :]
                 
                 dim += averages.get_item(detected_Class)
@@ -171,24 +173,24 @@ def execute():
 
                 #Calcular la score ponderando con la distancia 
                 
-                conf = conf[argmax]
-                conf = conf/(1+(0.025*location[2]))
+                # conf = conf[argmax]
+                # conf = conf/(1+(0.025*location[2]))
 
                 file_name = SAVE_PATH+"/"+label_files[i].split("/")[7]
                 # file_name = SAVE_PATH+"/"+"{:010d}.txt".format(i)
                 detection_2_file(file_name,name,theta_ray,element.data,dim,location,alpha,conf)
 
-                #plot_2d_box(yolo_im,box_2d) #Plot the yolo detection
+                plot_2d_box(yolo_im,box_2d) #Plot the yolo detection
+                #compute_draw_3D(gt_im,label_files[i],proj_matrix) #Draw the kitti 3D bbox alone.
                
                 if(conf> conf_threshold):
-                             
+                    #compute_draw_3D(im,label_files[i],proj_matrix) #Draw the kitti 3D bbox within the same image.        
                     plot_bird_view(birdview_im, dim, alpha, theta_ray,location)
-                    compute_draw_3D(im,label_files[i],proj_matrix) #Draw the kitti 3D bbox.
-                
+
                 
 
-            else:
-                print("Objeto fuera de rango")
+            # else:
+            #     print("Objeto fuera de rango")
 
         
         
@@ -204,8 +206,10 @@ def execute():
         
         #cv2.imshow("{}".format(i),im)
         #cv2.imshow("{}_birdview".format(i),birdview_im)
+        #cv2.imshow("{}_kitti_gt".format(i),gt_im)
+        #cv2.imwrite(SAVE_PATH+"/{}_gt.png".format(i),gt_im)
         cv2.imwrite(SAVE_PATH+"/{}.png".format(i),im)
-        #cv2.imwrite(SAVE_PATH+"/{}_yolo.png".format(i),yolo_im)
+        cv2.imwrite(SAVE_PATH+"/{}_yolo.png".format(i),yolo_im)
         #cv2.imwrite(SAVE_PATH+"/{}_bird.png".format(i),birdview_im)
 
     
